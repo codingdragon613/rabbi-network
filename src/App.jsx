@@ -9,7 +9,7 @@ function App() {
   const [selectedRabbi, setSelectedRabbi] = useState(null);
 
   useEffect(() => {
-    fetch('/data.json')
+    fetch(import.meta.env.BASE_URL + 'data.json')
       .then(res => res.json())
       .then(d => {
         setData(d);
