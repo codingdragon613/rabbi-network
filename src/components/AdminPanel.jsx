@@ -86,7 +86,7 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
     }
 
     return (
-        <div className="absolute inset-0 bg-slate-950/95 z-50 overflow-y-auto p-8 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-slate-950/95 z-50 overflow-y-auto p-8 backdrop-blur-sm">
             <div className="max-w-4xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-white">Data Editor</h1>
