@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from './components/Sidebar';
 import GraphView from './components/GraphView';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Settings } from 'lucide-react';
+import AdminPanel from './components/AdminPanel';
 
 function App() {
   const [data, setData] = useState({ rabbis: [], relationships: [] });
   const [loading, setLoading] = useState(true);
   const [selectedRabbi, setSelectedRabbi] = useState(null);
+  const [showAdmin, setShowAdmin] = useState(false);
 
   useEffect(() => {
     fetch(import.meta.env.BASE_URL + 'data.json')
@@ -51,9 +53,24 @@ function App() {
           relationships={data.relationships}
           onNodeClick={handleNodeClick}
         />
-        <div className="absolute top-4 right-4 pointer-events-none">
-          {/* Optional overlay controls could go here */}
+        <div className="absolute top-4 right-4 pointer-events-auto z-50">
+          <button
+            onClick={() => setShowAdmin(!showAdmin)}
+            className="p-2 bg-slate-900/50 hover:bg-slate-800 text-slate-400 hover:text-white rounded-full transition-colors backdrop-blur-sm border border-slate-700"
+            title="Toggle Admin Mode"
+          >
+            <Settings size={20} />
+          </button>
         </div>
+        {showAdmin && (
+          <AdminPanel
+            currentData={data}
+            onUpdateLocalData={(newData) => {
+              setData(newData);
+              // Optional: Close admin on save? Or keep open?
+            }}
+          />
+        )}
       </main>
     </div>
   );
