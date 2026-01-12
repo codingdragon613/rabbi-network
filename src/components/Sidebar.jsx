@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { Search, Info, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
 const Sidebar = ({ rabbis, onSelect, selectedRabbi }) => {
     const [query, setQuery] = useState('');
-
     const filtered = rabbis.filter(r =>
         r.name.toLowerCase().includes(query.toLowerCase())
     );
-
     return (
         <div className="w-80 h-full bg-slate-900 border-r border-slate-800 flex flex-col text-slate-100 shadow-xl z-10">
             <div className="p-4 border-b border-slate-800">
@@ -16,7 +13,6 @@ const Sidebar = ({ rabbis, onSelect, selectedRabbi }) => {
                     Rabbi Network
                 </h1>
             </div>
-
             <div className="p-4">
                 <div className="relative">
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
@@ -29,7 +25,6 @@ const Sidebar = ({ rabbis, onSelect, selectedRabbi }) => {
                     />
                 </div>
             </div>
-
             <div className="flex-1 overflow-y-auto p-2 space-y-1">
                 {filtered.map(rabbi => (
                     <motion.div
@@ -47,12 +42,11 @@ const Sidebar = ({ rabbis, onSelect, selectedRabbi }) => {
                         </div>
                         <div>
                             <div className="font-medium text-sm">{rabbi.name}</div>
-                            <div className="text-xs text-slate-400">{rabbi.category} • Gen {rabbi.generation}</div>
+                            <div className="text-xs text-slate-400">{rabbi.category} • {rabbi.region || 'Israel'}</div>
                         </div>
                     </motion.div>
                 ))}
             </div>
-
             <AnimatePresence>
                 {selectedRabbi && (
                     <motion.div
@@ -73,7 +67,7 @@ const Sidebar = ({ rabbis, onSelect, selectedRabbi }) => {
                                 {selectedRabbi.category}
                             </span>
                             <span className="px-2 py-1 bg-slate-800 rounded border border-slate-700">
-                                Gen {selectedRabbi.generation}
+                                {selectedRabbi.region || 'Israel'}
                             </span>
                         </div>
                     </motion.div>
@@ -82,5 +76,4 @@ const Sidebar = ({ rabbis, onSelect, selectedRabbi }) => {
         </div>
     );
 };
-
 export default Sidebar;
