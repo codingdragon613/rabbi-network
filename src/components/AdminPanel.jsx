@@ -4,11 +4,13 @@ import { Save, Lock, Plus, Trash2, X } from 'lucide-react';
 const AdminPanel = ({ currentData, onUpdateLocalData }) => {
     const [token, setToken] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [status, setStatus] = useState('');
+    const [status, setStatus] = useState(''); // 'idle', 'saving', 'success', 'error'
+    // Local state for editing before save
     const [data, setData] = useState(currentData);
-    const [view, setView] = useState('list');
+    const [view, setView] = useState('list'); // 'list', 'edit-rabbi', 'edit-rel'
     const [editingItem, setEditingItem] = useState(null);
     const [editingRel, setEditingRel] = useState(null);
+    const [editingRelIndex, setEditingRelIndex] = useState(null);
     const handleAuth = () => {
         if (token) setIsAuthenticated(true);
     };
@@ -20,7 +22,7 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
             await gh.saveData(data, `Update data: ${new Date().toISOString()}`);
             setStatus('success');
             setTimeout(() => setStatus(''), 3000);
-            onUpdateLocalData(data);
+            onUpdateLocalData(data); // Update main app state instantly
         } catch (error) {
             console.error(error);
             setStatus('error');
@@ -33,6 +35,7 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
     };
     const addRelationship = () => {
         setEditingRel({ source: '', target: '', type: 'Student' });
+        setEditingRelIndex(null);
         setView('edit-rel');
     };
     const saveRabbi = (rabbi) => {
@@ -48,10 +51,16 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
         setEditingItem(null);
     };
     const saveRelationship = (rel) => {
-        const newRels = [...data.relationships, rel];
-        setData({...data, relationships: newRels});
+        const newRels = [...data.relationships];
+        if (editingRelIndex !== null) {
+            newRels[editingRelIndex] = rel;
+        } else {
+            newRels.push(rel);
+        }
+        setData({ ...data, relationships: newRels });
         setView('list');
         setEditingRel(null);
+        setEditingRelIndex(null);
     };
     const deleteRelationship = (idx) => {
         const newRels = [...data.relationships];
@@ -95,7 +104,7 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
     }
     return (
         <div style={{ position: 'fixed', inset: 0, zIndex: 50 }} className="bg-slate-950/95 overflow-y-auto p-8 backdrop-blur-sm">
-            <div className="max-w-4xl mx-auto mt-10">
+            <div className="max-w-4xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-white">Data Editor</h1>
                     <div className="flex gap-4">
@@ -103,13 +112,13 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                             onClick={handleSaveToGitHub}
                             disabled={status === 'saving'}
                             className={`flex items-center gap-2 px-6 py-2 rounded font-bold transition-all ${status === 'success' ? 'bg-green-600' :
-                                    status === 'error' ? 'bg-red-600' : 'bg-blue-600 hover:bg-blue-500'
+                                status === 'error' ? 'bg-red-600' : 'bg-blue-600 hover:bg-blue-500'
                                 }`}
                         >
                             <Save size={18} />
                             {status === 'saving' ? 'Saving...' : status === 'success' ? 'Saved!' : 'Save Changes'}
                         </button>
-                        <button onClick={() => window.location.reload()} className="text-slate-400 hover:text-white pb-1 border-b border-transparent hover:border-white">
+                        <button onClick={() => window.location.hash = ''} className="text-slate-400 hover:text-white pb-1 border-b border-transparent hover:border-white">
                             Exit
                         </button>
                     </div>
@@ -157,7 +166,10 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                                                 <span className="text-purple-400">{tgt}</span>
                                                 <div className="text-xs text-slate-500 uppercase mt-1">{rel.type}</div>
                                             </div>
-                                            <button onClick={() => deleteRelationship(idx)} className="text-red-500 hover:text-red-400 px-2"><Trash2 size={16} /></button>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => { setEditingRel(rel); setEditingRelIndex(idx); setView('edit-rel'); }} className="text-slate-400 hover:text-white px-2">Edit</button>
+                                                <button onClick={() => deleteRelationship(idx)} className="text-red-500 hover:text-red-400 px-2"><Trash2 size={16} /></button>
+                                            </div>
                                         </div>
                                     )
                                 })}
@@ -221,12 +233,11 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                         </div>
                     </div>
                 )}
-                
                 {view === 'edit-rel' && editingRel && (
                     <div className="bg-slate-900 p-8 rounded-lg border border-slate-800 max-w-lg mx-auto">
-                        <h2 className="text-xl font-bold mb-6">Add Relationship</h2>
+                        <h2 className="text-xl font-bold mb-6">{editingRelIndex !== null ? 'Edit Relationship' : 'Add Relationship'}</h2>
                         <div className="space-y-4">
-                             <div>
+                            <div>
                                 <label className="block text-sm text-slate-400 mb-1">Source Rabbi</label>
                                 <select className="w-full bg-slate-800 border border-slate-700 p-2 rounded"
                                     value={editingRel.source}
@@ -235,8 +246,8 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                                     <option value="">Select Source...</option>
                                     {data.rabbis.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                                 </select>
-                             </div>
-                             <div>
+                            </div>
+                            <div>
                                 <label className="block text-sm text-slate-400 mb-1">Target Rabbi</label>
                                 <select className="w-full bg-slate-800 border border-slate-700 p-2 rounded"
                                     value={editingRel.target}
@@ -245,8 +256,8 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                                     <option value="">Select Target...</option>
                                     {data.rabbis.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                                 </select>
-                             </div>
-                             <div>
+                            </div>
+                            <div>
                                 <label className="block text-sm text-slate-400 mb-1">Relationship Type</label>
                                 <select className="w-full bg-slate-800 border border-slate-700 p-2 rounded"
                                     value={editingRel.type}
@@ -258,11 +269,12 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                                     <option value="Son">Son</option>
                                     <option value="Father">Father</option>
                                 </select>
-                             </div>
-                            
+                            </div>
                             <div className="flex justify-end gap-2 mt-6">
                                 <button onClick={() => setView('list')} className="px-4 py-2 text-slate-400 hover:text-white">Cancel</button>
-                                <button onClick={() => saveRelationship(editingRel)} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-bold">Add</button>
+                                <button onClick={() => saveRelationship(editingRel)} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-bold">
+                                    {editingRelIndex !== null ? 'Save' : 'Add'}
+                                </button>
                             </div>
                         </div>
                     </div>
