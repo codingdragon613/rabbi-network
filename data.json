@@ -1,49 +1,49 @@
 {
-    "rabbis": [
-        {
-            "id": "1",
-            "name": "Rabbi Yehuda HaNasi",
-            "category": "Tanna",
-            "generation": 5,
-            "description": "Redactor of the Mishnah. Leader of the Jewish people."
-        },
-        {
-            "id": "2",
-            "name": "Rabban Shimon ben Gamliel II",
-            "category": "Tanna",
-            "generation": 4,
-            "description": "Father of Rabbi Yehuda HaNasi. Nasi of the Sanhedrin."
-        },
-        {
-            "id": "3",
-            "name": "Rav",
-            "category": "Amora",
-            "generation": 1,
-            "description": "Abba Arika. Student of Rabbi Yehuda HaNasi. Founder of the Sura Academy."
-        },
-        {
-            "id": "4",
-            "name": "Hillel the Elder",
-            "category": "Tanna",
-            "generation": 1,
-            "description": "Famous sage, Nasi of the Sanhedrin."
-        }
-    ],
-    "relationships": [
-        {
-            "source": "2",
-            "target": "1",
-            "type": "father"
-        },
-        {
-            "source": "1",
-            "target": "3",
-            "type": "teacher"
-        },
-        {
-            "source": "4",
-            "target": "2",
-            "type": "ancestor"
-        }
-    ]
+  "rabbis": [
+    {
+      "id": "1",
+      "name": "Rabbi Yehuda HaNasi",
+      "category": "Tanna",
+      "generation": 5,
+      "description": "Redactor of the Mishnah. Leader of the Jewish people."
+    },
+    {
+      "id": "2",
+      "name": "Rabban Shimon ben Gamliel II",
+      "category": "Tanna",
+      "generation": 4,
+      "description": "Father of Rabbi Yehuda HaNasi. Nasi of the Sanhedrin."
+    },
+    {
+      "id": "3",
+      "name": "Rav",
+      "category": "Amora",
+      "generation": 1,
+      "description": "Abba Arika. Student of Rabbi Yehuda HaNasi. Founder of the Sura Academy."
+    },
+    {
+      "id": "4",
+      "name": "Hillel the Elder",
+      "category": "Tanna",
+      "generation": 1,
+      "description": "Famous sage, Nasi of the Sanhedrin."
+    }
+  ],
+  "relationships": [
+    {
+      "source": "2",
+      "target": "1",
+      "type": "father"
+    },
+    {
+      "source": "1",
+      "target": "3",
+      "type": "teacher"
+    },
+    {
+      "source": "4",
+      "target": "2",
+      "type": "ancestor"
+    }
+  ]
 }
