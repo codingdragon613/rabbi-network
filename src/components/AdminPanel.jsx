@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GitHubService } from '../services/github';
 import { Save, Lock, Plus, Trash2, X } from 'lucide-react';
-const AdminPanel = ({ currentData, onUpdateLocalData }) => {
+const AdminPanel = ({ currentData, onUpdateLocalData, onClose }) => {
     const [token, setToken] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [status, setStatus] = useState(''); // 'idle', 'saving', 'success', 'error'
@@ -118,7 +118,7 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                             <Save size={18} />
                             {status === 'saving' ? 'Saving...' : status === 'success' ? 'Saved!' : 'Save Changes'}
                         </button>
-                        <button onClick={() => window.location.hash = ''} className="text-slate-400 hover:text-white pb-1 border-b border-transparent hover:border-white">
+                        <button onClick={onClose} className="text-slate-400 hover:text-white pb-1 border-b border-transparent hover:border-white">
                             Exit
                         </button>
                     </div>
