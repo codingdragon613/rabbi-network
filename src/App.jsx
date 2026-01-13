@@ -3,13 +3,11 @@ import Sidebar from './components/Sidebar';
 import GraphView from './components/GraphView';
 import { Loader2, Settings } from 'lucide-react';
 import AdminPanel from './components/AdminPanel';
-
 function App() {
   const [data, setData] = useState({ rabbis: [], relationships: [] });
   const [loading, setLoading] = useState(true);
   const [selectedRabbi, setSelectedRabbi] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
-
   useEffect(() => {
     fetch(import.meta.env.BASE_URL + 'data.json')
       .then(res => res.json())
@@ -22,16 +20,13 @@ function App() {
         setLoading(false);
       });
   }, []);
-
   const handleNodeClick = (rabbiData) => {
     setSelectedRabbi(rabbiData);
   };
-
   const handleSidebarSelect = (rabbi) => {
     setSelectedRabbi(rabbi);
     // Ideally we would also center the graph on this node
   };
-
   if (loading) {
     return (
       <div className="h-screen w-screen bg-slate-950 flex items-center justify-center text-white">
@@ -39,7 +34,6 @@ function App() {
       </div>
     );
   }
-
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-200 font-sans">
       <Sidebar
@@ -65,9 +59,9 @@ function App() {
         {showAdmin && (
           <AdminPanel
             currentData={data}
+            onClose={() => setShowAdmin(false)}
             onUpdateLocalData={(newData) => {
               setData(newData);
-              // Optional: Close admin on save? Or keep open?
             }}
           />
         )}
@@ -75,5 +69,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
