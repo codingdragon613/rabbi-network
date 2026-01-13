@@ -4,10 +4,9 @@ import { Save, Lock, Plus, Trash2, X } from 'lucide-react';
 const AdminPanel = ({ currentData, onUpdateLocalData }) => {
     const [token, setToken] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [status, setStatus] = useState(''); // 'idle', 'saving', 'success', 'error'
-    // Local state for editing before save
+    const [status, setStatus] = useState('');
     const [data, setData] = useState(currentData);
-    const [view, setView] = useState('list'); // 'list', 'edit-rabbi', 'edit-rel'
+    const [view, setView] = useState('list');
     const [editingItem, setEditingItem] = useState(null);
     const [editingRel, setEditingRel] = useState(null);
     const handleAuth = () => {
@@ -21,7 +20,7 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
             await gh.saveData(data, `Update data: ${new Date().toISOString()}`);
             setStatus('success');
             setTimeout(() => setStatus(''), 3000);
-            onUpdateLocalData(data); // Update main app state instantly
+            onUpdateLocalData(data);
         } catch (error) {
             console.error(error);
             setStatus('error');
@@ -49,12 +48,8 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
         setEditingItem(null);
     };
     const saveRelationship = (rel) => {
-        // For simplicity, we just add to the list. Editing existing ones is tricky without IDs.
-        // We will just allow adding new ones and deleting old ones for now, OR simplistic replacement if index is known (but we don't track index easily).
-        // Let's assume we are adding a NEW one or replacing if we tracked an index. 
-        // For this simple implementation, we'll just push.
         const newRels = [...data.relationships, rel];
-        setData({ ...data, relationships: newRels });
+        setData({...data, relationships: newRels});
         setView('list');
         setEditingRel(null);
     };
@@ -71,34 +66,36 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
     };
     if (!isAuthenticated) {
         return (
-            <div className="p-8 max-w-md mx-auto bg-slate-900 rounded-xl border border-slate-800 shadow-2xl mt-10">
-                <div className="text-center mb-6">
-                    <Lock className="w-12 h-12 text-blue-500 mx-auto mb-2" />
-                    <h2 className="text-2xl font-bold text-white">Admin Access</h2>
-                    <p className="text-slate-400 text-sm">Enter your GitHub Personal Access Token to edit data.</p>
+            <div style={{ position: 'fixed', inset: 0, zIndex: 50 }} className="bg-slate-950/95 flex items-center justify-center p-4 backdrop-blur-sm">
+                <div className="p-8 max-w-md w-full bg-slate-900 rounded-xl border border-slate-800 shadow-2xl">
+                    <div className="text-center mb-6">
+                        <Lock className="w-12 h-12 text-blue-500 mx-auto mb-2" />
+                        <h2 className="text-2xl font-bold text-white">Admin Access</h2>
+                        <p className="text-slate-400 text-sm">Enter your GitHub Personal Access Token to edit data.</p>
+                    </div>
+                    <input
+                        type="password"
+                        placeholder="ghp_xxxxxxxxxxxx"
+                        className="w-full bg-slate-800 border-slate-700 rounded p-2 text-white mb-4"
+                        value={token}
+                        onChange={(e) => setToken(e.target.value)}
+                    />
+                    <button
+                        onClick={handleAuth}
+                        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition-colors"
+                    >
+                        Unlock Editor
+                    </button>
+                    <p className="mt-4 text-xs text-slate-500 text-center">
+                        Token is not stored anywhere. It is used once for this session.
+                    </p>
                 </div>
-                <input
-                    type="password"
-                    placeholder="ghp_xxxxxxxxxxxx"
-                    className="w-full bg-slate-800 border-slate-700 rounded p-2 text-white mb-4"
-                    value={token}
-                    onChange={(e) => setToken(e.target.value)}
-                />
-                <button
-                    onClick={handleAuth}
-                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition-colors"
-                >
-                    Unlock Editor
-                </button>
-                <p className="mt-4 text-xs text-slate-500 text-center">
-                    Token is not stored anywhere. It is used once for this session.
-                </p>
             </div>
         );
     }
     return (
-        <div className="fixed inset-0 bg-slate-950/95 z-50 overflow-y-auto p-8 backdrop-blur-sm">
-            <div className="max-w-4xl mx-auto">
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50 }} className="bg-slate-950/95 overflow-y-auto p-8 backdrop-blur-sm">
+            <div className="max-w-4xl mx-auto mt-10">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-white">Data Editor</h1>
                     <div className="flex gap-4">
@@ -106,13 +103,13 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                             onClick={handleSaveToGitHub}
                             disabled={status === 'saving'}
                             className={`flex items-center gap-2 px-6 py-2 rounded font-bold transition-all ${status === 'success' ? 'bg-green-600' :
-                                status === 'error' ? 'bg-red-600' : 'bg-blue-600 hover:bg-blue-500'
+                                    status === 'error' ? 'bg-red-600' : 'bg-blue-600 hover:bg-blue-500'
                                 }`}
                         >
                             <Save size={18} />
                             {status === 'saving' ? 'Saving...' : status === 'success' ? 'Saved!' : 'Save Changes'}
                         </button>
-                        <button onClick={() => window.location.hash = ''} className="text-slate-400 hover:text-white pb-1 border-b border-transparent hover:border-white">
+                        <button onClick={() => window.location.reload()} className="text-slate-400 hover:text-white pb-1 border-b border-transparent hover:border-white">
                             Exit
                         </button>
                     </div>
@@ -224,11 +221,12 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                         </div>
                     </div>
                 )}
+                
                 {view === 'edit-rel' && editingRel && (
                     <div className="bg-slate-900 p-8 rounded-lg border border-slate-800 max-w-lg mx-auto">
                         <h2 className="text-xl font-bold mb-6">Add Relationship</h2>
                         <div className="space-y-4">
-                            <div>
+                             <div>
                                 <label className="block text-sm text-slate-400 mb-1">Source Rabbi</label>
                                 <select className="w-full bg-slate-800 border border-slate-700 p-2 rounded"
                                     value={editingRel.source}
@@ -237,8 +235,8 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                                     <option value="">Select Source...</option>
                                     {data.rabbis.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                                 </select>
-                            </div>
-                            <div>
+                             </div>
+                             <div>
                                 <label className="block text-sm text-slate-400 mb-1">Target Rabbi</label>
                                 <select className="w-full bg-slate-800 border border-slate-700 p-2 rounded"
                                     value={editingRel.target}
@@ -247,8 +245,8 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                                     <option value="">Select Target...</option>
                                     {data.rabbis.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                                 </select>
-                            </div>
-                            <div>
+                             </div>
+                             <div>
                                 <label className="block text-sm text-slate-400 mb-1">Relationship Type</label>
                                 <select className="w-full bg-slate-800 border border-slate-700 p-2 rounded"
                                     value={editingRel.type}
@@ -260,7 +258,8 @@ const AdminPanel = ({ currentData, onUpdateLocalData }) => {
                                     <option value="Son">Son</option>
                                     <option value="Father">Father</option>
                                 </select>
-                            </div>
+                             </div>
+                            
                             <div className="flex justify-end gap-2 mt-6">
                                 <button onClick={() => setView('list')} className="px-4 py-2 text-slate-400 hover:text-white">Cancel</button>
                                 <button onClick={() => saveRelationship(editingRel)} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-bold">Add</button>
